@@ -61,6 +61,9 @@ export default function UserRow({
       case "ADMIN":
         return "bg-blue-100 text-blue-700";
 
+      case "MANAGER":
+        return "bg-indigo-100 text-indigo-700";
+
       case "HR":
         return "bg-purple-100 text-purple-700";
 

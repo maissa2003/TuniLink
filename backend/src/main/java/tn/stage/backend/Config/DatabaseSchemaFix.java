@@ -14,12 +14,23 @@ public class DatabaseSchemaFix {
     }
 
     @PostConstruct
-    public void removeLegacyLanguageColumn() {
+    public void applyMigrations() {
         try {
             jdbcTemplate.execute("ALTER TABLE users DROP COLUMN IF EXISTS language");
         } catch (Exception ex) {
-            // Ignore migration failures during startup so the app can still boot.
             System.err.println("Legacy language column migration skipped: " + ex.getMessage());
+        }
+        try {
+            jdbcTemplate.execute("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check");
+            jdbcTemplate.execute("""
+                ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (
+                  role::text = ANY (ARRAY[
+                    'ADMIN','MANAGER','HR','FINANCE','INFRASTRUCTURE','CLIENT','EMPLOYEE'
+                  ]::text[])
+                )
+                """);
+        } catch (Exception ex) {
+            System.err.println("Role check constraint migration skipped: " + ex.getMessage());
         }
     }
 }

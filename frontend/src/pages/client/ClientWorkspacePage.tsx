@@ -4,6 +4,7 @@ import ClientOverview from "@/components/client/ClientOverview";
 import ClientTeam from "@/components/client/ClientTeam";
 import ClientSimulations from "@/components/client/ClientSimulations";
 import ClientInvoices from "@/components/client/ClientInvoices";
+import ClientRequestsPage from "@/components/client/ClientRequestsPage";
 import ClientHistory from "@/components/client/ClientHistory";
 import { resolveClientPage } from "@/lib/clientPaths";
 
@@ -11,6 +12,7 @@ const pages: Record<string, ComponentType> = {
   overview: ClientOverview,
   team: ClientTeam,
   simulations: ClientSimulations,
+  requests: ClientRequestsPage,
   invoices: ClientInvoices,
   history: ClientHistory,
 };

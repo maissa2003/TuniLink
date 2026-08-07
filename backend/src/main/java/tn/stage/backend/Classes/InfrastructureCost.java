@@ -34,6 +34,16 @@ public class InfrastructureCost {
     @Column(precision = 12, scale = 2, nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "cost_month", nullable = false)
-    private LocalDate costMonth;
+    @Column(name = "resource_name")
+    private String resourceName;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "assignment_date", nullable = false)
+    private LocalDate assignmentDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_by_user_id")
+    private User assignedBy;
 }

@@ -8,13 +8,16 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "employees")
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIgnoreProperties({"documents", "leaveRequests", "user", "company", "assignments", "infrastructureCosts", "variations", "contracts", "payrollRecords"})
 public class Employee {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +30,17 @@ public class Employee {
     private String fullName;
 
     private String nationality;
+
+    private String phone;
+
+    @Column(name = "date_of_birth")
+    private java.time.LocalDate dateOfBirth;
+
+    @Column(columnDefinition = "TEXT")
+    private String address;
+
+    @Column(name = "cin_number")
+    private String cinNumber;
 
     // Was a separate Department entity - simplified to a plain attribute
     private String department;
@@ -63,4 +77,16 @@ public class Employee {
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Variation> variations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LeaveRequest> leaveRequests = new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Document> documents = new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EmployeeContract> contracts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PayrollRecord> payrollRecords = new ArrayList<>();
 }
