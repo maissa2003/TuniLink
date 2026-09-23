@@ -22,8 +22,12 @@ public class SalarySimulation {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "assignment_id", nullable = false)
+    @JoinColumn(name = "assignment_id") // Nullable car la simulation peut être faite avant l'embauche
     private Assignment assignment;
+
+    @ManyToOne
+    @JoinColumn(name = "resource_request_id")
+    private ResourceRequest resourceRequest;
 
     @Column(nullable = false)
     private String name; // ex: "Scénario A - hausse 5%/an"

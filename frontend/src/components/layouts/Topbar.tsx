@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Bell, LogOut, Menu, Search } from "lucide-react";
+
+import { Bell, Globe, LogOut, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getNavigationGroups, navGroupTitle, navTitle, portalTitle, roleLabel } from "@/lib/navigation";
+import { getNavigationGroups, portalTitle, roleLabel } from "@/lib/navigation";
 import { useLanguage } from "@/lib/useLanguage";
 import { clearSession, getProfilePicture } from "@/lib/profile";
+import SidebarNavGroups from "./SidebarNavGroups";
 
 export default function Topbar() {
   const [open, setOpen] = useState(false);
@@ -35,18 +36,22 @@ export default function Topbar() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger><span className="flex rounded-md p-2 lg:hidden"><Menu className="h-6 w-6" /></span></SheetTrigger>
       <SheetContent side="left" className="w-80 bg-[#1E3A8A] p-0">
-        <div className="border-b border-blue-800 p-6">
-          <h2 className="text-xl font-bold text-white">{t("app.name")}</h2>
-          <p className="text-sm text-blue-200">{portalTitle(role, language)}</p>
+        <div className="border-b border-blue-800 p-6 flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
+            <Globe className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <p className="text-lg font-bold text-white leading-tight">TuniLink</p>
+            <p className="text-xs text-blue-200 leading-tight">{portalTitle(role, language)}</p>
+          </div>
         </div>
-        <nav className="space-y-5 overflow-y-auto p-4">
-          {navigationGroups.map((group, index) => <div key={group.titleKey ?? index} className="space-y-1">
-            {group.titleKey && <p className="px-4 text-xs font-semibold uppercase tracking-wide text-blue-200">{navGroupTitle(group, language)}</p>}
-            {group.items.map((item) => {
-              const Icon = item.icon;
-              return <Link key={item.href} to={item.href} onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-blue-100 hover:bg-blue-700 hover:text-white"><Icon className="h-5 w-5" />{navTitle(item, language)}</Link>;
-            })}
-          </div>)}
+        <nav className="space-y-4 overflow-y-auto p-4">
+          <SidebarNavGroups
+            groups={navigationGroups}
+            language={language}
+            onNavigate={() => setOpen(false)}
+            linkClassName="text-sm py-3"
+          />
         </nav>
       </SheetContent>
     </Sheet>

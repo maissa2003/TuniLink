@@ -1,5 +1,5 @@
 import { Link, useLocation, useParams } from "react-router-dom";
-import { ArrowRight, BarChart3, Briefcase, Calculator, FileText, Receipt, Users, Wallet } from "lucide-react";
+import { ArrowRight, BarChart3, Calculator, Receipt, Users, Wallet } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/lib/useLanguage";
 
@@ -21,25 +21,8 @@ const domains: Record<string, { titleKey: string; textKey: string; cards: Domain
       { titleKey: "nav.reports", textKey: "admin.domain.finance.reports", href: "/admin/finance/reports", icon: BarChart3 },
     ],
   },
-  hr: {
-    titleKey: "admin.domain.hr.title",
-    textKey: "admin.domain.hr.text",
-    cards: [
-      { titleKey: "nav.employees", textKey: "admin.domain.hr.employees", href: "/admin/hr/employees", icon: Users },
-      { titleKey: "nav.contracts", textKey: "admin.domain.hr.contracts", href: "/admin/hr/contracts", icon: FileText },
-      { titleKey: "nav.payrollInputs", textKey: "admin.domain.hr.payroll", href: "/admin/hr/payroll", icon: Wallet },
-    ],
-  },
-  clients: {
-    titleKey: "admin.domain.clients.title",
-    textKey: "admin.domain.clients.text",
-    cards: [
-      { titleKey: "nav.myTeam", textKey: "admin.domain.clients.team", href: "/admin/clients/team", icon: Briefcase },
-      { titleKey: "nav.simulations", textKey: "admin.domain.clients.simulations", href: "/admin/clients/simulations", icon: Calculator },
-      { titleKey: "nav.invoices", textKey: "admin.domain.clients.invoices", href: "/admin/clients/invoices", icon: Receipt },
-      { titleKey: "nav.history", textKey: "admin.domain.clients.history", href: "/admin/clients/history", icon: FileText },
-    ],
-  },
+
+
 };
 
 export default function AdminDomainPage() {

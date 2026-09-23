@@ -9,8 +9,8 @@ import java.util.Map;
 public class RoleCompanyValidator {
 
     private static final Map<CompanyType, List<Role>> ALLOWED_ROLES = Map.of(
-            CompanyType.INFRASTRUCTURE_PROVIDER, List.of(Role.INFRASTRUCTURE, Role.ADMIN),
-            CompanyType.RECRUITMENT_AGENCY, List.of(Role.HR, Role.FINANCE, Role.ADMIN, Role.EMPLOYEE),
+            CompanyType.INFRASTRUCTURE_PROVIDER, List.of(Role.INFRASTRUCTURE),
+            CompanyType.RECRUITMENT_AGENCY, List.of(Role.MANAGER, Role.HR, Role.FINANCE, Role.EMPLOYEE),
             CompanyType.CLIENT, List.of(Role.CLIENT)
     );
 

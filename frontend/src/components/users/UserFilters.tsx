@@ -39,7 +39,8 @@ export default function UserFilters({
   const roleOptions = [
     { value: "ALL", label: t("admin.users.allRoles") },
     { value: "ADMIN", label: t("role.ADMIN") },
-    { value: "HR", label: "HR" },
+    { value: "MANAGER", label: t("role.MANAGER") },
+    { value: "HR", label: t("role.HR") },
     { value: "FINANCE", label: t("role.FINANCE") },
     { value: "EMPLOYEE", label: t("role.EMPLOYEE") },
     { value: "CLIENT", label: t("role.CLIENT") },
