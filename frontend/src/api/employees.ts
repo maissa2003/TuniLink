@@ -28,6 +28,7 @@ export interface EmployeeDto {
   email?: string;
   username?: string;
   userId?: number;
+  avatar?: string;
 }
 
 export const employeeApi = {

@@ -1,304 +1,46 @@
 import { Link } from "react-router-dom";
 import {
-  Users, FileText, Wallet, BarChart3, TrendingUp, TrendingDown,
-  ArrowRight, CheckCircle2, Clock, AlertTriangle, Building2,
-  CalendarDays, UserCheck, DollarSign, Activity, ShieldCheck,
-  UserPlus, ChevronRight,
+  AreaChart, Area, XAxis, YAxis,
+  CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
+} from "recharts";
+import {
+  Users, BarChart3,
+  ArrowRight, Building2, UserCheck,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 const managerName = localStorage.getItem("username") ?? "Manager";
 
-const KPI_CARDS = [
-  {
-    label: "Total Employees",
-    value: "48",
-    sub: "+3 this month",
-    trend: "up",
-    icon: Users,
-    gradient: "from-blue-500 to-blue-700",
-    lightBg: "bg-blue-50",
-    textColor: "text-blue-700",
-  },
-  {
-    label: "Active Contracts",
-    value: "42",
-    sub: "6 pending renewal",
-    trend: "neutral",
-    icon: FileText,
-    gradient: "from-violet-500 to-violet-700",
-    lightBg: "bg-violet-50",
-    textColor: "text-violet-700",
-  },
-  {
-    label: "Monthly Payroll",
-    value: "€ 184K",
-    sub: "+2.4% vs last month",
-    trend: "up",
-    icon: DollarSign,
-    gradient: "from-emerald-500 to-emerald-700",
-    lightBg: "bg-emerald-50",
-    textColor: "text-emerald-700",
-  },
-  {
-    label: "Pending Leaves",
-    value: "7",
-    sub: "3 urgent",
-    trend: "down",
-    icon: CalendarDays,
-    gradient: "from-amber-500 to-amber-600",
-    lightBg: "bg-amber-50",
-    textColor: "text-amber-700",
-  },
+const MRR_DATA = [
+  { month: "Sep '25", mrr: 112 },
+  { month: "Oct '25", mrr: 116 },
+  { month: "Nov '25", mrr: 120 },
+  { month: "Dec '25", mrr: 118 },
+  { month: "Jan '26", mrr: 126 },
+  { month: "Feb '26", mrr: 130 },
+  { month: "Mar '26", mrr: 134 },
+  { month: "Apr '26", mrr: 140 },
+  { month: "May '26", mrr: 148 },
+  { month: "Jun '26", mrr: 156 },
+  { month: "Jul '26", mrr: 164 },
+  { month: "Aug '26", mrr: 184 },
 ];
 
-const DEPARTMENT_HEALTH = [
-  { dept: "HR", status: "healthy", employees: 5, issues: 0, color: "text-emerald-600", bg: "bg-emerald-50", badge: "bg-emerald-100 text-emerald-700" },
-  { dept: "Finance", status: "healthy", employees: 6, issues: 1, color: "text-blue-600", bg: "bg-blue-50", badge: "bg-blue-100 text-blue-700" },
-  { dept: "Engineering", status: "attention", employees: 22, issues: 3, color: "text-amber-600", bg: "bg-amber-50", badge: "bg-amber-100 text-amber-700" },
-  { dept: "Business Dev.", status: "healthy", employees: 9, issues: 0, color: "text-violet-600", bg: "bg-violet-50", badge: "bg-violet-100 text-violet-700" },
-  { dept: "Infrastructure", status: "critical", employees: 6, issues: 2, color: "text-red-600", bg: "bg-red-50", badge: "bg-red-100 text-red-700" },
-];
-
-const RECENT_ACTIVITY = [
-  { type: "leave", text: "Malek Guemri submitted a sick leave request", time: "2 hours ago", icon: CalendarDays, color: "text-amber-600 bg-amber-100" },
-  { type: "contract", text: "New contract signed — Sarra Khelifi (Business Analyst)", time: "Yesterday", icon: FileText, color: "text-blue-600 bg-blue-100" },
-  { type: "hire", text: "Ahmed Ben Salah onboarded as DevOps Engineer", time: "2 days ago", icon: UserCheck, color: "text-emerald-600 bg-emerald-100" },
-  { type: "payroll", text: "July 2026 payroll inputs submitted by Finance", time: "3 days ago", icon: Wallet, color: "text-violet-600 bg-violet-100" },
-  { type: "alert", text: "Contract renewal due: Youssef Mabrouk (Aug 2026)", time: "4 days ago", icon: AlertTriangle, color: "text-red-600 bg-red-100" },
-  { type: "hire", text: "Recruitment request approved — NorthBridge Tech", time: "5 days ago", icon: UserPlus, color: "text-blue-600 bg-blue-100" },
-];
-
-const QUICK_ACTIONS = [
-  { label: "HR Management", desc: "Employees, contracts, leave & documents", href: "/workspace/hr", icon: Users, color: "bg-blue-600 hover:bg-blue-700" },
-  { label: "Finance", desc: "Payroll, margins, invoices & reports", href: "/workspace/finance", icon: BarChart3, color: "bg-violet-600 hover:bg-violet-700" },
-  { label: "Employee Portal", desc: "View employee self-service area", href: "/workspace/employees", icon: UserCheck, color: "bg-emerald-600 hover:bg-emerald-700" },
-];
-
-const PENDING_ITEMS = [
-  { label: "Leave requests awaiting approval", count: 7, href: "/workspace/hr/leave-requests", urgency: "high" },
-  { label: "Contracts up for renewal (Aug 2026)", count: 4, href: "/workspace/hr/contracts", urgency: "medium" },
-  { label: "Payroll inputs to validate", count: 2, href: "/workspace/finance/payroll", urgency: "high" },
-  { label: "New recruitment requests", count: 3, href: "/workspace/hr/requests", urgency: "low" },
-];
-
-const urgencyConfig = {
-  high: { badge: "bg-red-100 text-red-700", dot: "bg-red-500" },
-  medium: { badge: "bg-amber-100 text-amber-700", dot: "bg-amber-500" },
-  low: { badge: "bg-blue-100 text-blue-700", dot: "bg-blue-500" },
-};
-
-export default function ManagerOverview() {
-  const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
   return (
-    <div className="space-y-8">
-      {/* Hero Header */}
-      <div
-        className="relative overflow-hidden rounded-2xl p-8 text-white"
-        style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%)" }}
-      >
-        {/* Decorative circles */}
-        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/5" />
-        <div className="pointer-events-none absolute -bottom-8 right-32 h-40 w-40 rounded-full bg-white/5" />
-        <div className="pointer-events-none absolute bottom-4 -left-8 h-24 w-24 rounded-full bg-white/10" />
-
-        <div className="relative flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-blue-200 text-sm font-medium mb-2">
-              <Building2 className="h-4 w-4" />
-              <span>TuniLink — Agency Manager Dashboard</span>
-            </div>
-            <h1 className="text-3xl font-bold">
-              Good {getGreeting()}, {managerName} 👋
-            </h1>
-            <p className="mt-1 text-blue-200 text-sm">{today}</p>
-            <p className="mt-3 text-blue-100 max-w-md text-sm leading-relaxed">
-              Here's a full overview of your agency's performance. You have{" "}
-              <span className="font-semibold text-white">7 pending actions</span> requiring your attention.
-            </p>
-          </div>
-          <div className="mt-4 sm:mt-0 flex gap-2">
-            <Link
-              to="/workspace/hr"
-              className="inline-flex items-center gap-2 rounded-xl bg-white/20 backdrop-blur px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/30 transition-all"
-            >
-              <Users className="h-4 w-4" />
-              Manage HR
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {KPI_CARDS.map((kpi) => {
-          const Icon = kpi.icon;
-          return (
-            <div
-              key={kpi.label}
-              className="relative overflow-hidden rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 group"
-            >
-              <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br ${kpi.gradient} opacity-[0.04]`} />
-              <div className="p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{kpi.label}</p>
-                    <p className="mt-2 text-3xl font-bold text-slate-900">{kpi.value}</p>
-                    <div className={`mt-2 flex items-center gap-1 text-xs font-medium ${kpi.trend === "up" ? "text-emerald-600" : kpi.trend === "down" ? "text-red-500" : "text-slate-500"}`}>
-                      {kpi.trend === "up" && <TrendingUp className="h-3 w-3" />}
-                      {kpi.trend === "down" && <TrendingDown className="h-3 w-3" />}
-                      {kpi.sub}
-                    </div>
-                  </div>
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${kpi.gradient} shadow-md`}>
-                    <Icon className="h-6 w-6 text-white" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Main grid */}
-      <div className="grid gap-6 xl:grid-cols-3">
-        {/* Left: Pending Actions */}
-        <div className="xl:col-span-2 space-y-6">
-          <Card className="border-slate-200 shadow-sm">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-blue-600" />
-                    Pending Actions
-                  </CardTitle>
-                  <CardDescription>Items that require your immediate attention</CardDescription>
-                </div>
-                <Badge className="bg-red-100 text-red-700 font-semibold">7 total</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {PENDING_ITEMS.map((item) => {
-                const cfg = urgencyConfig[item.urgency as keyof typeof urgencyConfig];
-                return (
-                  <Link key={item.label} to={item.href}>
-                    <div className="group flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 p-4 hover:border-blue-200 hover:bg-blue-50/40 transition-all cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <span className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
-                        <span className="text-sm font-medium text-slate-700 group-hover:text-blue-700 transition-colors">{item.label}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Badge className={`${cfg.badge} font-semibold text-xs`}>{item.count}</Badge>
-                        <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-blue-500 transition-colors" />
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </CardContent>
-          </Card>
-
-          {/* Department Health */}
-          <Card className="border-slate-200 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-emerald-600" />
-                Department Health
-              </CardTitle>
-              <CardDescription>Overview of each department's current status</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {DEPARTMENT_HEALTH.map((dept) => (
-                  <div key={dept.dept} className="flex items-center justify-between rounded-xl border border-slate-100 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${dept.bg}`}>
-                        <Users className={`h-4 w-4 ${dept.color}`} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-800">{dept.dept}</p>
-                        <p className="text-xs text-slate-400">{dept.employees} employees</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {dept.issues > 0 ? (
-                        <span className="text-xs text-slate-500">{dept.issues} issue{dept.issues > 1 ? "s" : ""}</span>
-                      ) : null}
-                      <Badge className={`${dept.badge} capitalize text-xs font-semibold`}>
-                        {dept.status === "healthy" && <CheckCircle2 className="h-3 w-3 mr-1" />}
-                        {dept.status === "attention" && <Clock className="h-3 w-3 mr-1" />}
-                        {dept.status === "critical" && <AlertTriangle className="h-3 w-3 mr-1" />}
-                        {dept.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right: Activity + Quick Actions */}
-        <div className="space-y-6">
-          {/* Quick Actions */}
-          <Card className="border-slate-200 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold uppercase tracking-wide text-slate-500">Quick Access</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {QUICK_ACTIONS.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <Link key={action.href} to={action.href}>
-                    <div className={`group flex items-center justify-between rounded-xl p-4 text-white transition-all cursor-pointer ${action.color}`}>
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20">
-                          <Icon className="h-4 w-4 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold">{action.label}</p>
-                          <p className="text-[11px] opacity-80 mt-0.5">{action.desc}</p>
-                        </div>
-                      </div>
-                      <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </Link>
-                );
-              })}
-            </CardContent>
-          </Card>
-
-          {/* Recent Activity */}
-          <Card className="border-slate-200 shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                <Activity className="h-4 w-4 text-slate-500" />
-                Recent Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-1">
-                {RECENT_ACTIVITY.map((item, i) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={i} className="flex items-start gap-3 py-3 border-b border-slate-100 last:border-0">
-                      <div className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${item.color}`}>
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-medium text-slate-700 leading-snug">{item.text}</p>
-                        <p className="text-[11px] text-slate-400 mt-0.5">{item.time}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+    <div style={{
+      background: "#fff",
+      border: "1px solid #dbeafe",
+      borderRadius: 16,
+      padding: "14px 20px",
+      boxShadow: "0 8px 32px rgba(30,58,138,0.12)",
+      minWidth: 160,
+    }}>
+      <p style={{ fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{label}</p>
+      <p style={{ fontSize: 26, fontWeight: 800, color: "#1d4ed8", margin: 0 }}>
+        {payload[0].value}k
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#6b7280", marginLeft: 6 }}>TND</span>
+      </p>
     </div>
   );
 }
@@ -308,4 +50,151 @@ function getGreeting() {
   if (h < 12) return "morning";
   if (h < 18) return "afternoon";
   return "evening";
+}
+
+export default function ManagerOverview() {
+  const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+  return (
+    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg,#eff6ff 0%,#ffffff 60%)" }}>
+
+      {/* Header */}
+      <div
+        style={{
+          background: "linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 55%,#2563eb 100%)",
+          borderRadius: 24,
+          padding: "40px 48px 36px",
+          marginBottom: 40,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ position: "absolute", right: -60, top: -60, width: 240, height: 240, borderRadius: "50%", background: "rgba(255,255,255,0.05)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: 130, bottom: -30, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#93c5fd", fontSize: 13, fontWeight: 500, marginBottom: 8 }}>
+          <Building2 size={15} />
+          <span>TuniLink — Agency Manager Dashboard</span>
+        </div>
+        <h1 style={{ color: "#fff", fontSize: 32, fontWeight: 800, margin: 0 }}>
+          Good {getGreeting()}, {managerName} 👋
+        </h1>
+        <p style={{ color: "#93c5fd", fontSize: 13, marginTop: 4, marginBottom: 0 }}>{today}</p>
+        <div style={{ marginTop: 24, display: "flex", gap: 12 }}>
+          <Link to="/workspace/hr"
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)",
+              borderRadius: 12, padding: "10px 20px", color: "#fff",
+              fontWeight: 600, fontSize: 13, textDecoration: "none",
+              transition: "background 0.18s",
+            }}
+          >
+            <Users size={15} /> Manage HR
+          </Link>
+        </div>
+      </div>
+
+      {/* Hero Chart */}
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: 24,
+          border: "1px solid #dbeafe",
+          boxShadow: "0 4px 40px rgba(30,58,138,0.08)",
+          padding: "40px 40px 32px",
+          marginBottom: 36,
+        }}
+      >
+        <div style={{ marginBottom: 28 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Agency Performance</p>
+          <h2 style={{ fontSize: 26, fontWeight: 800, color: "#111827", margin: "6px 0 4px" }}>Monthly Payroll (k TND)</h2>
+          <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>12-month payroll growth — from 112k to 184k TND, reflecting team expansion</p>
+        </div>
+        <div style={{ height: 480 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={MRR_DATA} margin={{ top: 20, right: 40, left: 10, bottom: 10 }}>
+              <defs>
+                <linearGradient id="managerGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#2563eb" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#2563eb" stopOpacity={0.01} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#eff6ff" vertical={false} />
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 12, fill: "#9ca3af", fontWeight: 500 }}
+                axisLine={false}
+                tickLine={false}
+                dy={10}
+              />
+              <YAxis
+                domain={[100, 200]}
+                tick={{ fontSize: 12, fill: "#9ca3af", fontWeight: 500 }}
+                axisLine={false}
+                tickLine={false}
+                width={52}
+                tickFormatter={(v) => `${v}k`}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#2563eb", strokeWidth: 1.5, strokeDasharray: "4 3" }} />
+              <ReferenceLine x="Aug '26" stroke="#dbeafe" strokeWidth={2} strokeDasharray="5 4"
+                label={{ value: "Today", position: "top", fontSize: 11, fill: "#9ca3af" }} />
+              <Area
+                type="monotone"
+                dataKey="mrr"
+                stroke="#1d4ed8"
+                strokeWidth={3.5}
+                fill="url(#managerGrad)"
+                dot={{ r: 5, fill: "#1d4ed8", stroke: "#fff", strokeWidth: 2.5 }}
+                activeDot={{ r: 8, fill: "#1d4ed8", stroke: "#fff", strokeWidth: 3 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid #eff6ff", display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ display: "inline-block", width: 32, height: 3, borderRadius: 99, background: "#1d4ed8" }} />
+          <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 500 }}>Total monthly payroll in k TND</span>
+        </div>
+      </div>
+
+      {/* Quick Access */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+        {[
+          { label: "HR Management", desc: "Employees, contracts, leave & documents", href: "/workspace/hr", icon: Users, color: "#2563eb" },
+          { label: "Finance", desc: "Payroll, margins, invoices & reports", href: "/workspace/finance", icon: BarChart3, color: "#7c3aed" },
+          { label: "Employee Portal", desc: "View employee self-service area", href: "/workspace/employees", icon: UserCheck, color: "#059669" },
+        ].map((a) => {
+          const Icon = a.icon;
+          return (
+            <Link key={a.href} to={a.href} style={{ textDecoration: "none" }}>
+              <div
+                style={{
+                  background: a.color,
+                  borderRadius: 16,
+                  padding: "18px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  cursor: "pointer",
+                  transition: "transform 0.18s, box-shadow 0.18s",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ""; (e.currentTarget as HTMLDivElement).style.boxShadow = ""; }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Icon size={18} color="#fff" />
+                  </div>
+                  <div>
+                    <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, margin: 0 }}>{a.label}</p>
+                    <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 11, margin: "2px 0 0" }}>{a.desc}</p>
+                  </div>
+                </div>
+                <ArrowRight size={16} color="rgba(255,255,255,0.7)" />
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

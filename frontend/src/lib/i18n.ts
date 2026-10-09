@@ -734,7 +734,6 @@ const dictionaries: Record<LanguageCode, Record<string, string>> = {
     "nav.payslips": "Fiches de paie",
     "nav.leaveRequests": "Demandes de congé",
     "nav.documents": "Documents",
-    "nav.agencyOverview": "Vue d'ensemble agence",
   },
   ar: {
     "app.name": "TuniLink",
@@ -995,7 +994,6 @@ const dictionaries: Record<LanguageCode, Record<string, string>> = {
     "nav.payslips": "كشوف الرواتب",
     "nav.leaveRequests": "طلبات الإجازة",
     "nav.documents": "الوثائق",
-    "nav.agencyOverview": "نظرة عامة للوكالة",
   },
   ca: {
     "app.name": "TuniLink",

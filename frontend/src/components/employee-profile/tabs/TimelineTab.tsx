@@ -51,7 +51,7 @@ export default function TimelineTab({ employee }: { employee: any }) {
 
       {events && events.length > 0 ? (
         <div className="relative border-l-2 border-slate-200 ml-4 pl-6 space-y-8 mt-8">
-          {events.map((event, idx) => (
+          {events.map(event => (
             <div key={event.id} className="relative">
               <div className="absolute -left-[35px] bg-white p-1 rounded-full border-2 border-slate-200">
                 {getEventIcon(event.eventType)}

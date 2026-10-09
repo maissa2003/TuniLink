@@ -1,91 +1,153 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, CalendarDays, FileText, FolderOpen, Wallet } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import StatsCard from "@/components/dashboard/StatsCard";
-import { useEmployeeBasePath } from "@/lib/employeePaths";
-import { useLanguage } from "@/lib/useLanguage";
+import {
+  AreaChart, Area, XAxis, YAxis,
+  CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
+} from "recharts";
+import { Wallet, CalendarDays, FileText, FolderOpen, ArrowRight } from "lucide-react";
 import EmployeePageShell from "./EmployeePageShell";
+import { useEmployeeBasePath } from "@/lib/employeePaths";
+
+const PAYSLIP_DATA = [
+  { month: "Sep '25", netSalary: 2450 },
+  { month: "Oct '25", netSalary: 2450 },
+  { month: "Nov '25", netSalary: 2450 },
+  { month: "Dec '25", netSalary: 2600 },
+  { month: "Jan '26", netSalary: 2600 },
+  { month: "Feb '26", netSalary: 2600 },
+  { month: "Mar '26", netSalary: 2600 },
+  { month: "Apr '26", netSalary: 2750 },
+  { month: "May '26", netSalary: 2750 },
+  { month: "Jun '26", netSalary: 2750 },
+  { month: "Jul '26", netSalary: 2750 },
+  { month: "Aug '26", netSalary: 2900 },
+];
+
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{
+      background: "#fff",
+      border: "1px solid #d1fae5",
+      borderRadius: 16,
+      padding: "14px 20px",
+      boxShadow: "0 8px 32px rgba(16,185,129,0.12)",
+      minWidth: 160,
+    }}>
+      <p style={{ fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{label}</p>
+      <p style={{ fontSize: 26, fontWeight: 800, color: "#059669", margin: 0 }}>
+        {payload[0].value.toLocaleString()}
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#6b7280", marginLeft: 6 }}>TND</span>
+      </p>
+    </div>
+  );
+}
 
 export default function EmployeeOverview() {
-  const { t } = useLanguage();
   const basePath = useEmployeeBasePath();
-
-  const quickLinks = [
-    { titleKey: "nav.myContract", textKey: "employee.overview.contractCard", href: `${basePath}/contract`, icon: FileText },
-    { titleKey: "nav.payslips", textKey: "employee.overview.payslipsCard", href: `${basePath}/payslips`, icon: Wallet },
-    { titleKey: "nav.leaveRequests", textKey: "employee.overview.leaveCard", href: `${basePath}/leave`, icon: CalendarDays },
-    { titleKey: "nav.documents", textKey: "employee.overview.documentsCard", href: `${basePath}/documents`, icon: FolderOpen },
-  ] as const;
+  const username = localStorage.getItem("username") ?? "Employee";
 
   return (
-    <EmployeePageShell title={t("employee.overview.title")} description={t("employee.overview.description")}>
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        <StatsCard title={t("employee.stats.contractStatus")} value={t("employee.stats.active")} icon={FileText} color="bg-green-100 text-green-600" />
-        <StatsCard title={t("employee.stats.nextPayslip")} value="28 Jul" icon={Wallet} color="bg-blue-100 text-blue-600" />
-        <StatsCard title={t("employee.stats.leaveBalance")} value="12" icon={CalendarDays} color="bg-amber-100 text-amber-600" />
-        <StatsCard title={t("employee.stats.documents")} value="6" icon={FolderOpen} color="bg-purple-100 text-purple-600" />
+    <EmployeePageShell title={`Welcome, ${username} 👋`} description="Your personal dashboard — salary history at a glance.">
+
+      {/* Hero Chart */}
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: 24,
+          border: "1px solid #d1fae5",
+          boxShadow: "0 4px 40px rgba(16,185,129,0.08)",
+          padding: "40px 40px 32px",
+          marginBottom: 36,
+        }}
+      >
+        <div style={{ marginBottom: 28 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Personal Finance</p>
+          <h2 style={{ fontSize: 26, fontWeight: 800, color: "#111827", margin: "6px 0 4px" }}>Net Salary Received (TND)</h2>
+          <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>12-month net salary history — Sep 2025 → Aug 2026</p>
+        </div>
+        <div style={{ height: 480 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={PAYSLIP_DATA} margin={{ top: 20, right: 40, left: 10, bottom: 10 }}>
+              <defs>
+                <linearGradient id="salaryGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.01} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0fdf4" vertical={false} />
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 12, fill: "#9ca3af", fontWeight: 500 }}
+                axisLine={false}
+                tickLine={false}
+                dy={10}
+              />
+              <YAxis
+                domain={[2200, 3100]}
+                tick={{ fontSize: 12, fill: "#9ca3af", fontWeight: 500 }}
+                axisLine={false}
+                tickLine={false}
+                width={56}
+                tickFormatter={(v) => `${v.toLocaleString()}`}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#10b981", strokeWidth: 1.5, strokeDasharray: "4 3" }} />
+              <ReferenceLine x="Aug '26" stroke="#d1fae5" strokeWidth={2} strokeDasharray="5 4"
+                label={{ value: "Today", position: "top", fontSize: 11, fill: "#9ca3af" }} />
+              <Area
+                type="monotone"
+                dataKey="netSalary"
+                stroke="#059669"
+                strokeWidth={3.5}
+                fill="url(#salaryGrad)"
+                dot={{ r: 5, fill: "#059669", stroke: "#fff", strokeWidth: 2.5 }}
+                activeDot={{ r: 8, fill: "#059669", stroke: "#fff", strokeWidth: 3 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid #f0fdf4", display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ display: "inline-block", width: 32, height: 3, borderRadius: 99, background: "#059669" }} />
+          <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 500 }}>Monthly net salary in TND</span>
+        </div>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader>
-            <CardTitle>{t("employee.overview.assignment")}</CardTitle>
-            <CardDescription>{t("employee.overview.assignmentDesc")}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm text-slate-600">
-            <div className="flex justify-between border-b border-slate-100 pb-2">
-              <span>{t("employee.fields.client")}</span>
-              <span className="font-medium text-slate-900">NorthBridge Tech Inc.</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-100 pb-2">
-              <span>{t("employee.fields.position")}</span>
-              <span className="font-medium text-slate-900">Full Stack Developer</span>
-            </div>
-            <div className="flex justify-between">
-              <span>{t("employee.fields.startDate")}</span>
-              <span className="font-medium text-slate-900">15 Jan 2025</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader>
-            <CardTitle>{t("employee.overview.recentActivity")}</CardTitle>
-            <CardDescription>{t("employee.overview.recentActivityDesc")}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm">
-            <div className="rounded-lg bg-slate-50 p-3">
-              <p className="font-medium text-slate-900">{t("employee.activity.payslipReady")}</p>
-              <p className="text-slate-500">{t("employee.activity.junePayslip")}</p>
-            </div>
-            <div className="rounded-lg bg-slate-50 p-3">
-              <p className="font-medium text-slate-900">{t("employee.activity.leaveApproved")}</p>
-              <p className="text-slate-500">{t("employee.activity.leaveDates")}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {quickLinks.map((item) => {
-          const Icon = item.icon;
+      {/* Quick Access */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 16 }}>
+        {[
+          { label: "My Contract", desc: "View contract details", href: `${basePath}/contract`, icon: FileText, color: "#2563eb" },
+          { label: "Payslips", desc: "Download monthly payslips", href: `${basePath}/payslips`, icon: Wallet, color: "#059669" },
+          { label: "Leave Requests", desc: "Submit or check leave", href: `${basePath}/leave`, icon: CalendarDays, color: "#d97706" },
+          { label: "Documents", desc: "View your files", href: `${basePath}/documents`, icon: FolderOpen, color: "#7c3aed" },
+        ].map((a) => {
+          const Icon = a.icon;
           return (
-            <Card key={item.href} className="border-slate-200 shadow-sm">
-              <CardHeader>
-                <Icon className="h-8 w-8 text-blue-700" />
-                <CardTitle className="mt-3">{t(item.titleKey)}</CardTitle>
-                <CardDescription>{t(item.textKey)}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link
-                  to={item.href}
-                  className="flex h-8 items-center justify-center rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/80"
-                >
-                  {t("workspace.open")}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </CardContent>
-            </Card>
+            <Link key={a.href} to={a.href} style={{ textDecoration: "none" }}>
+              <div
+                style={{
+                  background: a.color,
+                  borderRadius: 16,
+                  padding: "18px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  cursor: "pointer",
+                  transition: "transform 0.18s, box-shadow 0.18s",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ""; (e.currentTarget as HTMLDivElement).style.boxShadow = ""; }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Icon size={18} color="#fff" />
+                  </div>
+                  <div>
+                    <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, margin: 0 }}>{a.label}</p>
+                    <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 11, margin: "2px 0 0" }}>{a.desc}</p>
+                  </div>
+                </div>
+                <ArrowRight size={16} color="rgba(255,255,255,0.7)" />
+              </div>
+            </Link>
           );
         })}
       </div>

@@ -1,240 +1,168 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Briefcase, Calculator, FileText, Receipt, Activity, Users, ShieldAlert, CreditCard } from "lucide-react";
-import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import WorkspacePageShell from "@/components/shared/WorkspacePageShell";
-import { useLanguage } from "@/lib/useLanguage";
-import { useState, useEffect } from "react";
+import {
+  AreaChart, Area, XAxis, YAxis,
+  CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
+} from "recharts";
+import { Receipt, FileSearch, Users, ArrowRight } from "lucide-react";
 
-/* --- Fake Data --- */
-const invoiceHistory = [
-  { name: 'Jan', cost: 35000 },
-  { name: 'Feb', cost: 42000 },
-  { name: 'Mar', cost: 38000 },
-  { name: 'Apr', cost: 45000 },
-  { name: 'May', cost: 42800 },
-  { name: 'Jun', cost: 48000 },
+const DATA = [
+  { month: "Sep '25", invoicedCAD: 34 },
+  { month: "Oct '25", invoicedCAD: 35 },
+  { month: "Nov '25", invoicedCAD: 37 },
+  { month: "Dec '25", invoicedCAD: 36 },
+  { month: "Jan '26", invoicedCAD: 38 },
+  { month: "Feb '26", invoicedCAD: 40 },
+  { month: "Mar '26", invoicedCAD: 41 },
+  { month: "Apr '26", invoicedCAD: 43 },
+  { month: "May '26", invoicedCAD: 45 },
+  { month: "Jun '26", invoicedCAD: 48 },
+  { month: "Jul '26", invoicedCAD: 50 },
+  { month: "Aug '26", invoicedCAD: 56 },
 ];
 
-const payrollEvolution = [
-  { name: 'Jan', payroll: 28000 },
-  { name: 'Feb', payroll: 32000 },
-  { name: 'Mar', payroll: 31500 },
-  { name: 'Apr', payroll: 36000 },
-  { name: 'May', payroll: 35500 },
-  { name: 'Jun', payroll: 40000 },
-];
-
-const teamComposition = [
-  { name: 'Frontend Dev', value: 3 },
-  { name: 'Backend Dev', value: 2 },
-  { name: 'QA Engineer', value: 2 },
-  { name: 'DevOps', value: 1 },
-];
-
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
-
-function ModernStatCard({ title, value, subtext, icon: Icon, colorClass }: any) {
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
   return (
-    <Card className="border-slate-200 shadow-sm transition-all hover:shadow-md">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-slate-500">{title}</p>
-            <p className="text-3xl font-bold tracking-tight text-slate-900">{value}</p>
-          </div>
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${colorClass}`}>
-            <Icon className="h-6 w-6" />
-          </div>
-        </div>
-        <div className="mt-4 flex items-center text-sm text-slate-400">
-          {subtext}
-        </div>
-      </CardContent>
-    </Card>
+    <div style={{
+      background: "#fff",
+      border: "1px solid #d1fae5",
+      borderRadius: 16,
+      padding: "14px 20px",
+      boxShadow: "0 8px 32px rgba(16,185,129,0.12)",
+      minWidth: 160,
+    }}>
+      <p style={{ fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{label}</p>
+      <p style={{ fontSize: 26, fontWeight: 800, color: "#059669", margin: 0 }}>
+        {payload[0].value}k
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#6b7280", marginLeft: 6 }}>CAD</span>
+      </p>
+    </div>
   );
 }
 
 export default function ClientOverview() {
-  const { t } = useLanguage();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const quickLinks = [
-    { titleKey: "nav.myTeam", textKey: "client.overview.teamCard", href: "/workspace/team", icon: Briefcase },
-    { titleKey: "nav.simulations", textKey: "client.overview.simulationsCard", href: "/workspace/simulations", icon: Calculator },
-    { titleKey: "nav.invoices", textKey: "client.overview.invoicesCard", href: "/workspace/invoices", icon: Receipt },
-    { titleKey: "nav.history", textKey: "client.overview.historyCard", href: "/workspace/history", icon: FileText },
-  ] as const;
-
-  if (loading) {
-    return (
-      <WorkspacePageShell title={t("client.overview.title")} description={t("client.overview.description")}>
-        <div className="flex h-[60vh] items-center justify-center space-x-2">
-          <Activity className="h-6 w-6 animate-pulse text-blue-600" />
-          <span className="text-sm font-medium text-slate-500">Loading Client Dashboard...</span>
-        </div>
-      </WorkspacePageShell>
-    );
-  }
-
   return (
-    <WorkspacePageShell title={t("client.overview.title")} description={t("client.overview.description")}>
-      
-      {/* KPI Cards */}
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4 animate-in fade-in duration-500">
-        <ModernStatCard title="Assigned Employees" value="8" subtext="Active consultants" icon={Users} colorClass="bg-blue-100 text-blue-600" />
-        <ModernStatCard title="Active Contracts" value="8" subtext="All signed & valid" icon={FileText} colorClass="bg-emerald-100 text-emerald-600" />
-        <ModernStatCard title="Running Simulations" value="3" subtext="Pending review" icon={Calculator} colorClass="bg-amber-100 text-amber-600" />
-        <ModernStatCard title="Monthly Cost (CAD)" value="$42,800" subtext="Est. for current month" icon={CreditCard} colorClass="bg-purple-100 text-purple-600" />
+    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg,#f0fdf4 0%,#ffffff 60%)" }}>
+
+      {/* Header */}
+      <div
+        style={{
+          background: "linear-gradient(135deg,#064e3b 0%,#059669 55%,#10b981 100%)",
+          borderRadius: 24,
+          padding: "40px 48px 36px",
+          marginBottom: 40,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ position: "absolute", right: -60, top: -60, width: 240, height: 240, borderRadius: "50%", background: "rgba(255,255,255,0.05)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", left: -30, bottom: -40, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
+        <h1 style={{ color: "#fff", fontSize: 32, fontWeight: 800, margin: 0 }}>Client Dashboard 🤝</h1>
+        <p style={{ color: "#a7f3d0", fontSize: 14, marginTop: 6, marginBottom: 0 }}>
+          Monthly invoiced revenue — Sep 2025 → Aug 2026
+        </p>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2 animate-in fade-in duration-500 delay-100">
-        
-        {/* Payroll Evolution (Area Chart) */}
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Payroll Evolution (CAD)</CardTitle>
-            <CardDescription>Monthly payroll costs over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[280px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={payrollEvolution} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorPayroll" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(val) => `$${val/1000}k`} />
-                  <Tooltip 
-                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                    itemStyle={{ color: '#0f172a', fontWeight: 600 }}
-                  />
-                  <Area type="monotone" dataKey="payroll" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorPayroll)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Invoice History (Bar Chart) */}
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Project Costs (CAD)</CardTitle>
-            <CardDescription>Monthly invoiced amounts</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[280px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={invoiceHistory} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(val) => `$${val/1000}k`} />
-                  <Tooltip 
-                    cursor={{ fill: '#f1f5f9' }}
-                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                    itemStyle={{ color: '#0f172a', fontWeight: 600 }}
-                  />
-                  <Bar dataKey="cost" fill="#10b981" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
+      {/* Hero Chart */}
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: 24,
+          border: "1px solid #d1fae5",
+          boxShadow: "0 4px 40px rgba(16,185,129,0.08)",
+          padding: "40px 40px 32px",
+          marginBottom: 36,
+        }}
+      >
+        <div style={{ marginBottom: 28 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Client Revenue</p>
+          <h2 style={{ fontSize: 26, fontWeight: 800, color: "#111827", margin: "6px 0 4px" }}>Invoiced to Client (k CAD)</h2>
+          <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>12-month billing trend — steady growth from 34k to 56k CAD</p>
+        </div>
+        <div style={{ height: 480 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={DATA} margin={{ top: 20, right: 40, left: 10, bottom: 10 }}>
+              <defs>
+                <linearGradient id="clientGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.01} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0fdf4" vertical={false} />
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 12, fill: "#9ca3af", fontWeight: 500 }}
+                axisLine={false}
+                tickLine={false}
+                dy={10}
+              />
+              <YAxis
+                domain={[28, 62]}
+                tick={{ fontSize: 12, fill: "#9ca3af", fontWeight: 500 }}
+                axisLine={false}
+                tickLine={false}
+                width={48}
+                tickFormatter={(v) => `${v}k`}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#10b981", strokeWidth: 1.5, strokeDasharray: "4 3" }} />
+              <ReferenceLine x="Aug '26" stroke="#d1fae5" strokeWidth={2} strokeDasharray="5 4"
+                label={{ value: "Today", position: "top", fontSize: 11, fill: "#9ca3af" }} />
+              <Area
+                type="monotone"
+                dataKey="invoicedCAD"
+                stroke="#059669"
+                strokeWidth={3.5}
+                fill="url(#clientGrad)"
+                dot={{ r: 5, fill: "#059669", stroke: "#fff", strokeWidth: 2.5 }}
+                activeDot={{ r: 8, fill: "#059669", stroke: "#fff", strokeWidth: 3 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid #f0fdf4", display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ display: "inline-block", width: 32, height: 3, borderRadius: 99, background: "#059669" }} />
+          <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 500 }}>Monthly invoiced revenue in k CAD</span>
+        </div>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-3 animate-in fade-in duration-500 delay-200">
-        
-        {/* Team Composition (Donut Chart) */}
-        <Card className="border-slate-200 shadow-sm lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Team Composition</CardTitle>
-            <CardDescription>Breakdown by role</CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <div className="h-[220px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={teamComposition} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={5} dataKey="value">
-                    {teamComposition.map((_entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ borderRadius: '8px' }} />
-                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Contract Renewals List */}
-        <Card className="border-slate-200 shadow-sm lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Upcoming Contract Renewals</CardTitle>
-            <CardDescription>Contracts expiring in the next 90 days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { name: "John Doe", role: "Frontend Dev", date: "Aug 15, 2026", days: 23, critical: true },
-                { name: "Jane Smith", role: "Backend Dev", date: "Sep 01, 2026", days: 40, critical: false },
-                { name: "Alice Johnson", role: "QA Engineer", date: "Sep 20, 2026", days: 59, critical: false },
-              ].map((contract, i) => (
-                <div key={i} className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 p-3">
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-full ${contract.critical ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
-                      {contract.critical ? <ShieldAlert className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
-                    </div>
-                    <div>
-                      <p className="font-medium text-slate-900">{contract.name}</p>
-                      <p className="text-xs text-slate-500">{contract.role}</p>
-                    </div>
+      {/* Quick Access */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+        {[
+          { label: "My Team", desc: "View all placed employees", href: "/workspace/client/team", icon: Users, color: "#2563eb" },
+          { label: "Invoices", desc: "Review monthly billing", href: "/workspace/client/invoices", icon: Receipt, color: "#059669" },
+          { label: "Hiring Requests", desc: "Submit or track requests", href: "/workspace/client/requests", icon: FileSearch, color: "#d97706" },
+        ].map((a) => {
+          const Icon = a.icon;
+          return (
+            <Link key={a.href} to={a.href} style={{ textDecoration: "none" }}>
+              <div style={{
+                background: a.color,
+                borderRadius: 16,
+                padding: "18px 20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                transition: "transform 0.18s, box-shadow 0.18s",
+                cursor: "pointer",
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ""; (e.currentTarget as HTMLDivElement).style.boxShadow = ""; }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Icon size={18} color="#fff" />
                   </div>
-                  <div className="text-right">
-                    <p className={`text-sm font-semibold ${contract.critical ? 'text-red-600' : 'text-slate-700'}`}>
-                      Expires in {contract.days} days
-                    </p>
-                    <p className="text-xs text-slate-400">{contract.date}</p>
+                  <div>
+                    <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, margin: 0 }}>{a.label}</p>
+                    <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 11, margin: "2px 0 0" }}>{a.desc}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-      </div>
-
-      {/* Quick Links */}
-      <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {quickLinks.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Card key={item.href} className="border-slate-200 shadow-sm hover:border-blue-200 transition-colors">
-              <CardHeader className="pb-3">
-                <Icon className="h-8 w-8 text-blue-600 mb-2" />
-                <CardTitle>{t(item.titleKey)}</CardTitle>
-                <CardDescription>{t(item.textKey)}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link to={item.href} className="flex h-9 items-center justify-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white hover:bg-slate-800 transition-colors">
-                  {t("workspace.open")} <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </CardContent>
-            </Card>
+                <ArrowRight size={16} color="rgba(255,255,255,0.7)" />
+              </div>
+            </Link>
           );
         })}
       </div>
-      
-    </WorkspacePageShell>
+    </div>
   );
 }

@@ -307,8 +307,8 @@ export default function ClientRequestsPage() {
                       <tbody className="divide-y divide-slate-100">
                         {simResult.years.map((year, i) => (
                           <tr key={i} className="hover:bg-slate-50/50">
-                            <td className="px-4 py-2.5 font-medium text-slate-700">Year {year.yearIndex}</td>
-                            <td className="px-4 py-2.5 text-slate-600">{(year.employerCostTnd + year.marginTnd + year.infraCostTnd).toLocaleString()} TND</td>
+                            <td className="px-4 py-2.5 font-medium text-slate-700">Year {year.year}</td>
+                            <td className="px-4 py-2.5 text-slate-600">{year.totalCostTnd.toLocaleString()} TND</td>
                             <td className="px-4 py-2.5 text-right font-semibold text-slate-900">{fmtCad(year.finalInvoicedCad)}</td>
                           </tr>
                         ))}

@@ -1,287 +1,168 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { ArrowUpRight, Users, Building2, Wallet, Calculator, Receipt, DollarSign, Activity, Settings2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  AreaChart, Area, XAxis, YAxis,
+  CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
+} from "recharts";
+import { Wallet, Receipt, TrendingUp, ArrowRight } from "lucide-react";
 
-const monthlyData = [
-  { name: "Jan", revenue: 42000, expenses: 28000 },
-  { name: "Feb", revenue: 48000, expenses: 31000 },
-  { name: "Mar", revenue: 51000, expenses: 32000 },
-  { name: "Apr", revenue: 46000, expenses: 29000 },
-  { name: "May", revenue: 54000, expenses: 34000 },
-  { name: "Jun", revenue: 62000, expenses: 38000 },
-  { name: "Jul", revenue: 59000, expenses: 35000 },
-  { name: "Aug", revenue: 65000, expenses: 40000 },
-  { name: "Sep", revenue: 71000, expenses: 42000 },
-  { name: "Oct", revenue: 68000, expenses: 41000 },
-  { name: "Nov", revenue: 75000, expenses: 45000 },
-  { name: "Dec", revenue: 82000, expenses: 48000 },
+const DATA = [
+  { month: "Sep '25", invoicedCAD: 34 },
+  { month: "Oct '25", invoicedCAD: 35 },
+  { month: "Nov '25", invoicedCAD: 37 },
+  { month: "Dec '25", invoicedCAD: 36 },
+  { month: "Jan '26", invoicedCAD: 38 },
+  { month: "Feb '26", invoicedCAD: 40 },
+  { month: "Mar '26", invoicedCAD: 41 },
+  { month: "Apr '26", invoicedCAD: 43 },
+  { month: "May '26", invoicedCAD: 45 },
+  { month: "Jun '26", invoicedCAD: 48 },
+  { month: "Jul '26", invoicedCAD: 50 },
+  { month: "Aug '26", invoicedCAD: 56 },
 ];
 
-const recentInvoices = [
-  { id: "INV-2024-001", client: "TechCorp Inc.", amount: "$12,450.00", status: "Paid", date: "Oct 24, 2024" },
-  { id: "INV-2024-002", client: "Global Solutions Ltd.", amount: "$8,230.00", status: "Pending", date: "Oct 22, 2024" },
-  { id: "INV-2024-003", client: "Nexus Industries", amount: "$15,600.00", status: "Overdue", date: "Oct 15, 2024" },
-  { id: "INV-2024-004", client: "Apex Systems", amount: "$4,100.00", status: "Paid", date: "Oct 12, 2024" },
-];
-
-const recentModifications = [
-  { action: "Updated CNSS Tax Rate", user: "Admin", date: "2 hours ago" },
-  { action: "Approved Payroll for Oct 2024", user: "Finance Lead", date: "5 hours ago" },
-  { action: "Added new Infrastructure Cost (Cloud)", user: "Admin", date: "1 day ago" },
-  { action: "Modified Infrastructure Margin", user: "Finance Lead", date: "2 days ago" },
-];
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{
+      background: "#fff",
+      border: "1px solid #ede9fe",
+      borderRadius: 16,
+      padding: "14px 20px",
+      boxShadow: "0 8px 32px rgba(109,40,217,0.12)",
+      minWidth: 160,
+    }}>
+      <p style={{ fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{label}</p>
+      <p style={{ fontSize: 26, fontWeight: 800, color: "#7c3aed", margin: 0 }}>
+        {payload[0].value}k
+        <span style={{ fontSize: 13, fontWeight: 500, color: "#6b7280", marginLeft: 6 }}>CAD</span>
+      </p>
+    </div>
+  );
+}
 
 export default function FinanceOverview() {
-  const basePath = "/admin/finance"; // Fallback, could be dynamic based on role
-
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div style={{ minHeight: "100vh", background: "linear-gradient(160deg,#faf5ff 0%,#ffffff 60%)" }}>
+
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Finance Dashboard</h1>
-        <p className="text-slate-500 mt-1">Overview of your financial performance, payroll, and infrastructure.</p>
+      <div
+        style={{
+          background: "linear-gradient(135deg,#4c1d95 0%,#6d28d9 55%,#7c3aed 100%)",
+          borderRadius: 24,
+          padding: "40px 48px 36px",
+          marginBottom: 40,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{ position: "absolute", right: -60, top: -60, width: 240, height: 240, borderRadius: "50%", background: "rgba(255,255,255,0.05)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", left: -30, bottom: -40, width: 160, height: 160, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
+        <h1 style={{ color: "#fff", fontSize: 32, fontWeight: 800, margin: 0 }}>Finance Dashboard 💼</h1>
+        <p style={{ color: "#ddd6fe", fontSize: 14, marginTop: 6, marginBottom: 0 }}>
+          Monthly revenue invoiced to client — Sep 2025 → Aug 2026
+        </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Row 1 */}
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">$723,000</div>
-            <p className="text-xs text-emerald-600 flex items-center mt-1">
-              <ArrowUpRight className="mr-1 h-3 w-3" /> +14% from last month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Total Expenses</CardTitle>
-            <Activity className="h-4 w-4 text-rose-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">$443,000</div>
-            <p className="text-xs text-rose-600 flex items-center mt-1">
-              <ArrowUpRight className="mr-1 h-3 w-3" /> +8% from last month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Net Profit</CardTitle>
-            <Wallet className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">$280,000</div>
-            <p className="text-xs text-emerald-600 flex items-center mt-1">
-              <ArrowUpRight className="mr-1 h-3 w-3" /> +21% from last month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Profit Margin</CardTitle>
-            <Activity className="h-4 w-4 text-indigo-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">38.7%</div>
-            <p className="text-xs text-emerald-600 flex items-center mt-1">
-              <ArrowUpRight className="mr-1 h-3 w-3" /> +2.4% from last month
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Row 2 */}
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Payroll Costs</CardTitle>
-            <Users className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">$315,000</div>
-            <p className="text-xs text-slate-500 mt-1">25 Active Employees</p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Infrastructure Costs</CardTitle>
-            <Building2 className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">$128,000</div>
-            <p className="text-xs text-slate-500 mt-1">20 Active Items</p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Total Invoices</CardTitle>
-            <Receipt className="h-4 w-4 text-teal-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">142</div>
-            <p className="text-xs text-slate-500 mt-1">12 Pending Payment</p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Simulations</CardTitle>
-            <Calculator className="h-4 w-4 text-pink-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">854</div>
-            <p className="text-xs text-slate-500 mt-1">Generated this year</p>
-          </CardContent>
-        </Card>
+      {/* Hero Chart */}
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: 24,
+          border: "1px solid #ede9fe",
+          boxShadow: "0 4px 40px rgba(109,40,217,0.08)",
+          padding: "40px 40px 32px",
+          marginBottom: 36,
+        }}
+      >
+        <div style={{ marginBottom: 28 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Revenue Intelligence</p>
+          <h2 style={{ fontSize: 26, fontWeight: 800, color: "#111827", margin: "6px 0 4px" }}>Invoiced to Client (k CAD)</h2>
+          <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>12-month billing curve — steady growth from 34k to 56k CAD</p>
+        </div>
+        <div style={{ height: 480 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={DATA} margin={{ top: 20, right: 40, left: 10, bottom: 10 }}>
+              <defs>
+                <linearGradient id="financeGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#7c3aed" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.01} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f5f3ff" vertical={false} />
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 12, fill: "#9ca3af", fontWeight: 500 }}
+                axisLine={false}
+                tickLine={false}
+                dy={10}
+              />
+              <YAxis
+                domain={[28, 62]}
+                tick={{ fontSize: 12, fill: "#9ca3af", fontWeight: 500 }}
+                axisLine={false}
+                tickLine={false}
+                width={48}
+                tickFormatter={(v) => `${v}k`}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#7c3aed", strokeWidth: 1.5, strokeDasharray: "4 3" }} />
+              <ReferenceLine x="Aug '26" stroke="#ede9fe" strokeWidth={2} strokeDasharray="5 4"
+                label={{ value: "Today", position: "top", fontSize: 11, fill: "#9ca3af" }} />
+              <Area
+                type="monotone"
+                dataKey="invoicedCAD"
+                stroke="#6d28d9"
+                strokeWidth={3.5}
+                fill="url(#financeGrad)"
+                dot={{ r: 5, fill: "#6d28d9", stroke: "#fff", strokeWidth: 2.5 }}
+                activeDot={{ r: 8, fill: "#6d28d9", stroke: "#fff", strokeWidth: 3 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid #f5f3ff", display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ display: "inline-block", width: 32, height: 3, borderRadius: 99, background: "#6d28d9" }} />
+          <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 500 }}>Monthly invoiced revenue in k CAD</span>
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-7 lg:grid-cols-7">
-        {/* Main Chart */}
-        <Card className="md:col-span-4 lg:col-span-5 shadow-sm border-slate-200">
-          <CardHeader>
-            <CardTitle>Revenue vs Expenses</CardTitle>
-            <CardDescription>Monthly financial performance for the current year</CardDescription>
-          </CardHeader>
-          <CardContent className="px-2">
-            <div className="h-[350px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={monthlyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-                    itemStyle={{ fontSize: "14px", fontWeight: 500 }}
-                  />
-                  <Area type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
-                  <Area type="monotone" dataKey="expenses" stroke="#f43f5e" strokeWidth={2} fillOpacity={1} fill="url(#colorExpenses)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Shortcuts */}
-        <Card className="md:col-span-3 lg:col-span-2 shadow-sm border-slate-200">
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Frequently used finance modules</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Link to={`${basePath}/payroll`} className="flex items-center p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors group">
-              <div className="bg-amber-100 p-2 rounded-md mr-3 group-hover:bg-amber-200 transition-colors">
-                <Users className="h-5 w-5 text-amber-700" />
-              </div>
-              <div>
-                <div className="font-medium text-sm text-slate-900">Manage Payroll</div>
-                <div className="text-xs text-slate-500">Employee salaries & taxes</div>
-              </div>
-            </Link>
-            <Link to={`${basePath}/invoices`} className="flex items-center p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors group">
-              <div className="bg-teal-100 p-2 rounded-md mr-3 group-hover:bg-teal-200 transition-colors">
-                <Receipt className="h-5 w-5 text-teal-700" />
-              </div>
-              <div>
-                <div className="font-medium text-sm text-slate-900">Invoices</div>
-                <div className="text-xs text-slate-500">View and track payments</div>
-              </div>
-            </Link>
-            <Link to={`${basePath}/infrastructure`} className="flex items-center p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors group">
-              <div className="bg-purple-100 p-2 rounded-md mr-3 group-hover:bg-purple-200 transition-colors">
-                <Building2 className="h-5 w-5 text-purple-700" />
-              </div>
-              <div>
-                <div className="font-medium text-sm text-slate-900">Infrastructure</div>
-                <div className="text-xs text-slate-500">Manage operating costs</div>
-              </div>
-            </Link>
-            <Link to={`${basePath}/taxes`} className="flex items-center p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors group">
-              <div className="bg-slate-100 p-2 rounded-md mr-3 group-hover:bg-slate-200 transition-colors">
-                <Settings2 className="h-5 w-5 text-slate-700" />
-              </div>
-              <div>
-                <div className="font-medium text-sm text-slate-900">Taxes & Settings</div>
-                <div className="text-xs text-slate-500">Configure global rates</div>
-              </div>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bottom Lists */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Recent Invoices */}
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader>
-            <CardTitle>Recent Invoices</CardTitle>
-            <CardDescription>Latest client billing activity</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentInvoices.map((inv) => (
-                <div key={inv.id} className="flex items-center justify-between border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                  <div>
-                    <div className="font-medium text-sm text-slate-900">{inv.client}</div>
-                    <div className="text-xs text-slate-500">{inv.id} • {inv.date}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-sm text-slate-900">{inv.amount}</div>
-                    <div className={`text-[10px] font-bold uppercase tracking-wider mt-1 rounded-full px-2 py-0.5 inline-block
-                      ${inv.status === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 
-                        inv.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
-                      {inv.status}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Link to={`${basePath}/invoices`} className="mt-6 block text-center text-sm font-medium text-blue-600 hover:text-blue-700">
-              View all invoices →
-            </Link>
-          </CardContent>
-        </Card>
-
-        {/* Recent Modifications */}
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest financial system changes</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {recentModifications.map((mod, i) => (
-                <div key={i} className="flex items-start">
-                  <div className="mt-0.5 bg-blue-100 p-1.5 rounded-full mr-3">
-                    <Activity className="h-4 w-4 text-blue-600" />
+      {/* Quick Access */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+        {[
+          { label: "Payroll", desc: "Validate monthly payroll", href: "/workspace/finance/payroll", icon: Wallet, color: "#7c3aed" },
+          { label: "Invoices", desc: "Track client billing", href: "/workspace/finance/invoices", icon: Receipt, color: "#059669" },
+          { label: "Margins", desc: "Configure profit margins", href: "/workspace/finance/margins", icon: TrendingUp, color: "#2563eb" },
+        ].map((a) => {
+          const Icon = a.icon;
+          return (
+            <Link key={a.href} to={a.href} style={{ textDecoration: "none" }}>
+              <div
+                style={{
+                  background: a.color,
+                  borderRadius: 16,
+                  padding: "18px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  cursor: "pointer",
+                  transition: "transform 0.18s, box-shadow 0.18s",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = ""; (e.currentTarget as HTMLDivElement).style.boxShadow = ""; }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Icon size={18} color="#fff" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-slate-900">{mod.action}</div>
-                    <div className="text-xs text-slate-500 mt-1">By {mod.user} • {mod.date}</div>
+                    <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, margin: 0 }}>{a.label}</p>
+                    <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 11, margin: "2px 0 0" }}>{a.desc}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <ArrowRight size={16} color="rgba(255,255,255,0.7)" />
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

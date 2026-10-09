@@ -41,5 +41,16 @@ services:
     ports:
       - "5173:5173"
 
+  # ── Fake SMTP server for local development ──
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: stage_mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI — open http://localhost:8025
+    environment:
+      MH_STORAGE: memory
+
 volumes:
   postgres_data:

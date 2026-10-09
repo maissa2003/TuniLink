@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import {
-  Briefcase, CheckCircle2, XCircle, Search, Clock, Users, Link2, Download,
-  ArrowRight, FileText, CalendarClock, ChevronRight, AlertCircle, Loader2
+  Briefcase, CheckCircle2, XCircle, Search, Clock, Users, Link2,
+  ArrowRight, FileText, CalendarClock, Loader2
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
@@ -326,11 +326,14 @@ function CandidateCard({
               </Button>
             )}
             {candidate.linkedinUrl && (
-              <Button variant="outline" size="sm" asChild className="w-full justify-start text-blue-600 border-blue-100 hover:bg-blue-50">
-                <a href={candidate.linkedinUrl} target="_blank" rel="noreferrer">
-                  <Link2 className="w-4 h-4 mr-2" /> LinkedIn Profile
-                </a>
-              </Button>
+              <a
+                href={candidate.linkedinUrl}
+                target="_blank"
+                rel="noreferrer"
+                className={`${buttonVariants({ variant: "outline", size: "sm" })} w-full justify-start text-blue-600 border-blue-100 hover:bg-blue-50`}
+              >
+                <Link2 className="w-4 h-4 mr-2" /> LinkedIn Profile
+              </a>
             )}
 
             <div className="my-2 border-t border-slate-100"></div>
